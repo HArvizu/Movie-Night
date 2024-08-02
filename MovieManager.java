@@ -46,15 +46,26 @@ public class MovieManager
         JButton calculateOverallButton = new JButton("Overall Score");
         calculateOverallButton.addActionListener(e -> {
             savedTitle = titleField.getText();
-            savedImdb = Double.parseDouble(imdbField.getText());
-            if (savedImdb > 10) {
-                savedImdb = savedImdb / 10.0;
+            String imdbText = imdbField.getText();
+            if (imdbText.isEmpty()) {
+                savedImdb = 0.0;
+            } else {
+                savedImdb = Double.parseDouble(imdbText);
+                if (savedImdb > 10) {
+                    savedImdb = savedImdb / 10.0;
+                }
             }
-            savedRottenTomatoes = Double.parseDouble(rottenTomatoesField.getText());
-            if (savedRottenTomatoes < 10) {
-                savedRottenTomatoes = savedRottenTomatoes * 10.0;
+
+            String rottenTomatoesText = rottenTomatoesField.getText();
+            if (rottenTomatoesText.isEmpty()) {
+                savedRottenTomatoes = 0.0;
+            } else {
+                savedRottenTomatoes = Double.parseDouble(rottenTomatoesText);
+                if (savedRottenTomatoes < 10) {
+                    savedRottenTomatoes = savedRottenTomatoes * 10.0;
+                }
+                savedRottenTomatoes = savedRottenTomatoes / 10.0;
             }
-            savedRottenTomatoes = savedRottenTomatoes / 10.0;
             
             String metacriticText = metacriticField.getText();
             if (metacriticText.isEmpty()) {
@@ -76,7 +87,16 @@ public class MovieManager
             }
 
             double overallScore;
-            if (savedMetacritic.equals("N/A") && savedOtherScore.equals("N/A")) {
+            if (savedImdb == 0.0 && savedRottenTomatoes == 0.0) {
+                overallScore = Double.parseDouble(savedOtherScore);
+                overallScoreField.setText(String.format("%.1f", overallScore));
+            } else if (savedImdb == 0.0) {
+                overallScore = (savedRottenTomatoes + Double.parseDouble(savedOtherScore)) / 2.0;
+                overallScoreField.setText(String.format("%.1f", overallScore));
+            } else if (savedRottenTomatoes == 0.0) {
+                overallScore = (savedImdb + Double.parseDouble(savedOtherScore)) / 2.0;
+                overallScoreField.setText(String.format("%.1f", overallScore));
+            } else if (savedMetacritic.equals("N/A") && savedOtherScore.equals("N/A")) {
                 overallScore = (savedImdb + savedRottenTomatoes) / 2.0;
                 overallScoreField.setText(String.format("%.1f", overallScore));
             } else if (savedMetacritic.equals("N/A")) {
@@ -243,8 +263,8 @@ class Movie
  * the code automatically fills in the IMDb score, Rotten Tomatoes score, and Metacritic score 
  * with what is seen on google.
  * 
- * While it’s technically possible to scrape data from Google search results, 
- * I realized that this is against Google’s Terms of Service. 
+ * While itâ€™s technically possible to scrape data from Google search results, 
+ * I realized that this is against Googleâ€™s Terms of Service. 
  * Web scraping can lead to your IP being blocked by Google, 
  * and it may also have legal implications.
  * 
